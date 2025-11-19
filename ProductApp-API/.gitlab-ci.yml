@@ -1,0 +1,155 @@
+stages:
+   - build
+   - test
+   - analyze
+   - quality-gate-check
+   - trivy_scan
+  #  - snyk_scan
+
+variables:
+  MAVEN_OPTS: -Dmaven.repo.local=.m2/repository
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_USER: soham
+  MYSQL_PASSWORD: soham
+  MYSQL_DATABASE: product
+  SPRING_DATASOURCE_URL: jdbc:mysql://172.27.59.174:3307/product
+  SPRING_DATASOURCE_USERNAME: soham
+  SPRING_DATASOURCE_PASSWORD: soham
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+
+# image: maven:latest
+
+build: 
+    stage: build
+    tags:
+      - product-app-runner
+    script: 
+    - echo "Maven compile started"
+    - "mvn package -DskipTests"
+    artifacts:
+      paths:
+      - target/*.jar
+
+test:
+    stage: test
+    tags:
+      - product-app-runner
+    script: 
+    - echo "Maven test started"
+    - "mvn test"
+
+sonarcloud-analysis-GitLab:
+  stage: analyze
+  tags:
+      - product-app-runner
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - mvn verify sonar:sonar -Dsonar.projectKey=sohamparik-g_product-app-api
+
+quality-gate-check:
+  stage: quality-gate-check
+  script:
+    - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=sohamparik-g_product-app-api >result.json
+    - cat result.json
+    - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+
+trivy_scan:
+  stage: trivy_scan
+  image: debian:buster
+  before_script:
+    - apt-get update
+    - apt-get install -y wget apt-transport-https gnupg lsb-release
+    - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
+    - echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
+    - apt-get update
+    - apt-get install -y trivy
+
+  script:
+    - trivy repo https://gitlab.com/sohamparik-g/product-app-api.git
+    - trivy --format json --output trivy_report.json repo https://gitlab.com/sohamparik-g/product-app-api.git
+
+  artifacts:
+    paths:
+      - trivy_report.json
+
+
+trivy_html_conversion:
+  stage: trivy_scan
+  image: debian:buster
+  needs:
+    - trivy_scan
+  before_script:
+    - apt-get update
+    - apt-get install -y wget apt-transport-https gnupg lsb-release jq
+  script:
+    - |
+      cat trivy_report.json | jq -r '[
+        "<html><body><table border=\"1\">",
+        "<tr><th>Target</th><th>Vulnerability ID</th><th>Severity</th><th>Description</th></tr>",
+        (.Results[] |
+          .Vulnerabilities[]? |
+          "<tr><td>\(.Target)</td><td>\(.VulnerabilityID)</td><td>\(.Severity)</td><td>\(.Description)</td></tr>"
+        ),
+        "</table></body></html>"
+      ] | .[]' > trivy_report.html
+  artifacts:
+    paths:
+      - trivy_report.html
+
+# snyk-scan:
+#   image: maven:latest
+#   stage: snyk_scan
+#   before_script:
+#     - apt-get update
+#     - apt-get install -y curl
+#     - curl -sL https://deb.nodesource.com/setup_14.x | bash -
+#     - apt-get install -y nodejs
+#     - npm install -g snyk
+#   script:
+#     - pwd  # Print the current directory for debugging
+#     - ls -l  # List the contents of the current directory for debugging
+#     - chmod +x mvnw  # Ensure mvnw script has execute permissions
+#     - ./mvnw --version  # Verify that mvnw is executable and check the Maven version
+#     - snyk auth $SNYK_TOKEN || { echo "Snyk authentication failed."; exit 1; }
+#   #   - snyk test --all-sub-projects > snyk_report.txt || echo "Snyk test completed with vulnerabilities."
+#   # artifacts:
+#   #   paths:
+#   #     - snyk_report.txt
+
+#     - snyk test --all-sub-projects --json > snyk_report.json || echo "Snyk test completed with vulnerabilities."
+#   artifacts:
+#     paths:
+#       - snyk_report.json
+
+#   # allow_failure: true
+
+
+# snyk_html_conversion:
+#   stage: snyk_scan
+#   image: debian:buster
+#   before_script:
+#     - apt-get update
+#     - apt-get install -y wget apt-transport-https gnupg lsb-release jq
+#   needs:
+#     - snyk-scan
+#   script:
+#     - |
+#       cat snyk_report.json | jq -r '[
+#         "<html><body><table border=\"1\">",
+#         "<tr><th>Package</th><th>Vulnerability ID</th><th>Severity</th><th>CVSS Score</th><th>URL</th><th>Description</th></tr>",
+#         (.vulnerabilities[]? | 
+#           "<tr><td>\(.packageName)</td><td>\(.id)</td><td>\(.severity)</td><td>\(.CVSS)</td><td><a href=\"\(.url)\">\(.url)</a></td><td>\(.description)</td></tr>"
+#         ),
+#         "</table></body></html>"
+#       ] | join("\n")' > snyk_report.html
+#   artifacts:
+#     paths:
+#       - snyk_report.html
+
+
+
+
+

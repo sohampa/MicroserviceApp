@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-chart
+  labels:
+    {{- include "mysql-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: mysql   # match the containerPort name in Deployment
+      protocol: TCP
+      name: mysql         # meaningful name
+  selector:
+    {{- include "mysql-chart.selectorLabels" . | nindent 4 }}

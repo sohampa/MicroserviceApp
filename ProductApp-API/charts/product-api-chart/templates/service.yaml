@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # name: {{ include "product-api-chart.fullname" . }}
+  name: spring-boot-app
+  labels:
+    {{- include "product-api-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "product-api-chart.selectorLabels" . | nindent 4 }}

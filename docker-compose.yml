@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: product
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./ReviewApp-API/create-review-db.sql:/docker-entrypoint-initdb.d/01-create-review-db.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padmin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  # Product API Service
+  spring-boot-app:
+    build:
+      context: ./ProductApp-API
+      dockerfile: Dockerfile
+    container_name: product-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/product?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - app-network
+
+  # Review API Service
+  review-service:
+    build:
+      context: ./ReviewApp-API
+      dockerfile: Dockerfile
+    container_name: review-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/review?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - app-network
+
+  # Product UI (React + Nginx)
+  product-ui:
+    build:
+      context: ./ProductApp-UI
+      dockerfile: Dockerfile
+    container_name: product-ui
+    ports:
+      - "80:80"
+    depends_on:
+      - spring-boot-app
+      - review-service
+    environment:
+      REACT_APP_API_BASE_URL: http://localhost
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+

@@ -1,0 +1,95 @@
+name: React CI Pipeline
+
+on:
+  push:
+    branches: [ "feature-Implement-CI-pipeline" ]
+  pull_request:
+    branches: [ "feature-Implement-CI-pipeline" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Install dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # 4. Compile & Build React app
+      - name: Build React App
+        run: CI=false npm run build
+
+      # 5. Static Code Analysis (SonarQube example)
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: ""
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # 6. Security Scan (npm audit or Snyk)
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate || echo "npm audit failed or not supported, skipping."
+
+      # 7. Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 8. Log in to DockerHub 
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 9. Set image tags
+      - name: Set image tags
+        id: vars
+        run: |
+          DATETIME_TAG=$(date +'%Y%m%d%H%M%S')   # e.g. 202508281635
+          SHA_TAG=${GITHUB_SHA::7}               # e.g. abc1234
+          IMAGE=${{ secrets.DOCKER_USERNAME }}/react-app
+          
+          echo "datetime_tag=$DATETIME_TAG" >> $GITHUB_OUTPUT
+          echo "sha_tag=$SHA_TAG" >> $GITHUB_OUTPUT
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+      # 10. Backup old latest (if exists)
+      - name: Backup old latest
+        run: |
+          IMAGE=${{ steps.vars.outputs.image }}
+          DATETIME_TAG=${{ steps.vars.outputs.datetime_tag }}
+          
+          if docker pull $IMAGE:latest; then
+            echo "Backing up old latest as $DATETIME_TAG"
+            docker tag $IMAGE:latest $IMAGE:$DATETIME_TAG
+            docker push $IMAGE:$DATETIME_TAG
+          else
+            echo "No old latest found, skipping backup."
+          fi
+
+      # 11. Build and push new image
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE=${{ steps.vars.outputs.image }}
+          SHA_TAG=${{ steps.vars.outputs.sha_tag }}
+
+          docker build -t $IMAGE:$SHA_TAG -t $IMAGE:latest .
+          docker push $IMAGE:$SHA_TAG
+          docker push $IMAGE:latest
+
+      # 12. Docker Image Scan (Trivy)
+      - name: Scan Docker Image with Trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/react-app:latest

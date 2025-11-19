@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product App UI Preview</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .preview-section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .preview-title {
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .star-rating {
+            color: #ffc107;
+            font-size: 1.2em;
+        }
+        .star-empty {
+            color: #e0e0e0;
+        }
+        .review-item {
+            border-left: 3px solid #007bff;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        .rating-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-5">Product App UI Preview</h1>
+        
+        <!-- Product List View -->
+        <div class="preview-section">
+            <h2 class="preview-title">1. Product List Page</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Products</a></li>
+                </ol>
+            </nav>
+            
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Rating</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Laptop Pro 15"</td>
+                        <td>$1,299.99</td>
+                        <td>25</td>
+                        <td>
+                            <span class="star-rating">★★★★★</span>
+                            <small>(4.8)</small>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-info btn-sm">View</button>
+                                <button class="btn btn-light btn-sm">Edit</button>
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>Wireless Mouse</td>
+                        <td>$29.99</td>
+                        <td>150</td>
+                        <td>
+                            <span class="star-rating">★★★★<span class="star-empty">★</span></span>
+                            <small>(4.2)</small>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-info btn-sm">View</button>
+                                <button class="btn btn-light btn-sm">Edit</button>
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>USB-C Cable</td>
+                        <td>$12.99</td>
+                        <td>300</td>
+                        <td>
+                            <span class="text-muted">No ratings</span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-info btn-sm">View</button>
+                                <button class="btn btn-light btn-sm">Edit</button>
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div>
+                <button class="btn btn-primary">Add</button>
+            </div>
+        </div>
+
+        <!-- Product Detail View -->
+        <div class="preview-section">
+            <h2 class="preview-title">2. Product Detail Page</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Products</a></li>
+                    <li class="breadcrumb-item active">1</li>
+                </ol>
+            </nav>
+            
+            <h4 class="text-center mb-5 mt-5">Product Info: 1</h4>
+            
+            <!-- Average Rating Display -->
+            <div class="text-center mb-3">
+                <strong>Average Rating: </strong>
+                <span class="star-rating">★★★★★</span>
+                <span class="ms-2">(4.8)</span>
+            </div>
+            
+            <!-- Product Info Table -->
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Title</th>
+                        <td>Laptop Pro 15"</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Price</th>
+                        <td>$1,299.99</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Quantity</th>
+                        <td>25</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Action Buttons -->
+            <div>
+                <div class="row">
+                    <div class="col-6">
+                        <button class="btn btn-light">Edit</button>
+                    </div>
+                    <div class="col-6 text-end">
+                        <button class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Review Form -->
+            <div class="mt-4">
+                <h5>Write a Review</h5>
+                <form>
+                    <div class="mb-3">
+                        <label for="reviewerName" class="form-label">Your Name (Optional)</label>
+                        <input type="text" class="form-control" id="reviewerName" placeholder="Enter your name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Rating</label>
+                        <select class="form-select" id="rating">
+                            <option value="1">1 Star</option>
+                            <option value="2">2 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="5" selected>5 Stars</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Comment</label>
+                        <textarea class="form-control" id="comment" rows="4" placeholder="Write your review here..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="mt-4">
+                <h5>Reviews (3)</h5>
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <strong>John Doe</strong>
+                                        <span class="ms-2 star-rating">★★★★★</span>
+                                    </div>
+                                    <small class="text-muted">Dec 15, 2024</small>
+                                </div>
+                                <p class="mb-0">Excellent laptop! Fast performance and great battery life. Highly recommend!</p>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger ms-3">×</button>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <strong>Sarah Smith</strong>
+                                        <span class="ms-2 star-rating">★★★★<span class="star-empty">★</span></span>
+                                    </div>
+                                    <small class="text-muted">Dec 10, 2024</small>
+                                </div>
+                                <p class="mb-0">Good laptop overall, but the screen could be brighter. Good value for money.</p>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger ms-3">×</button>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <strong>Mike Johnson</strong>
+                                        <span class="ms-2 star-rating">★★★★★</span>
+                                    </div>
+                                    <small class="text-muted">Dec 5, 2024</small>
+                                </div>
+                                <p class="mb-0">Perfect for my work needs. The build quality is outstanding!</p>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger ms-3">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty Reviews State -->
+        <div class="preview-section">
+            <h2 class="preview-title">3. Product with No Reviews</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Products</a></li>
+                    <li class="breadcrumb-item active">3</li>
+                </ol>
+            </nav>
+            
+            <h4 class="text-center mb-5 mt-5">Product Info: 3</h4>
+            
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Title</th>
+                        <td>USB-C Cable</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Price</th>
+                        <td>$12.99</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Quantity</th>
+                        <td>300</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div>
+                <div class="row">
+                    <div class="col-6">
+                        <button class="btn btn-light">Edit</button>
+                    </div>
+                    <div class="col-6 text-end">
+                        <button class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="mt-4">
+                <h5>Write a Review</h5>
+                <form>
+                    <div class="mb-3">
+                        <label for="reviewerName2" class="form-label">Your Name (Optional)</label>
+                        <input type="text" class="form-control" id="reviewerName2" placeholder="Enter your name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="rating2" class="form-label">Rating</label>
+                        <select class="form-select" id="rating2">
+                            <option value="1">1 Star</option>
+                            <option value="2">2 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="5" selected>5 Stars</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment2" class="form-label">Comment</label>
+                        <textarea class="form-control" id="comment2" rows="4" placeholder="Write your review here..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+
+            <div class="mt-4">
+                <h5>Reviews</h5>
+                <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+            </div>
+        </div>
+
+        <!-- Color Legend -->
+        <div class="preview-section">
+            <h2 class="preview-title">UI Features & Styling</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Color Scheme:</h5>
+                    <ul>
+                        <li><span class="star-rating">★</span> <strong>Gold Stars:</strong> Filled ratings (#ffc107)</li>
+                        <li><span class="star-empty">★</span> <strong>Gray Stars:</strong> Empty ratings (#e0e0e0)</li>
+                        <li><span class="badge bg-primary">Primary</span> <strong>Blue:</strong> Buttons, links (#007bff)</li>
+                        <li><span class="badge bg-danger">Danger</span> <strong>Red:</strong> Delete buttons (#dc3545)</li>
+                        <li><span class="badge bg-info">Info</span> <strong>Cyan:</strong> View buttons (#0dcaf0)</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Components:</h5>
+                    <ul>
+                        <li>✅ Product list with ratings column</li>
+                        <li>✅ Star rating visualization (1-5 stars)</li>
+                        <li>✅ Average rating display</li>
+                        <li>✅ Review submission form</li>
+                        <li>✅ Review list with delete functionality</li>
+                        <li>✅ Empty state for products without reviews</li>
+                        <li>✅ Bootstrap 5 styling</li>
+                        <li>✅ Responsive design</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
